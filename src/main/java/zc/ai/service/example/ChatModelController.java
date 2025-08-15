@@ -1,4 +1,4 @@
-package dev.langchain4j.example.lowlevel;
+package zc.ai.service.example;
 
 import dev.langchain4j.model.chat.ChatModel;
 import org.springframework.web.bind.annotation.GetMapping;

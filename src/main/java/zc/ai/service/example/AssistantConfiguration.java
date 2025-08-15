@@ -1,6 +1,5 @@
-package dev.langchain4j.example.aiservice;
+package zc.ai.service.example;
 
-import dev.langchain4j.example.lowlevel.ChatModelController;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;

@@ -1,4 +1,4 @@
-package dev.langchain4j.example.aiservice;
+package zc.ai.service.example;
 
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.spring.AiService;
