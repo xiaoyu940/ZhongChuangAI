@@ -4,14 +4,19 @@ import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.allminilml6v2q.AllMiniLmL6V2QuantizedEmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +30,9 @@ public class VectorSearchService {
 
     @Autowired
     private   EmbeddingModel embeddingModel;
+
+    @Value("${zc.ai.service.project-dir}")
+    private String tmpStoreFileDir;
 
     public VectorSearchResponse search(VectorSearchRequest request) {
         long startTime = System.currentTimeMillis();
@@ -88,5 +96,47 @@ public class VectorSearchService {
         List<String> ids = embeddingStore.addAll(embeddings, textSegments);
 
         return ids.size();
+    }
+
+    public String search2file(@Valid VectorSearchRequest request) {
+        String fileName =request.getResultFileName();
+        VectorSearchResponse result = this.search(request);
+        String newFileName = write2file(fileName, result);
+        return newFileName;
+    }
+
+    private String write2file(String fileName, VectorSearchResponse result){
+        if (fileName == null|| StringUtils.isEmpty(fileName)) {
+            fileName = "AI-"+System.currentTimeMillis() + ".txt";
+        }
+        File file = new File(this.tmpStoreFileDir + fileName);
+        //fileName=file.getAbsolutePath();
+        FileOutputStream out = null;
+        try {
+            if (file.exists()) {
+                file.delete();
+                file.createNewFile();
+            }
+            out = new FileOutputStream(file);
+            List<EmbeddingResult> retList = result.getResults();
+
+            for (EmbeddingResult ret : retList) {
+                out.write(ret.getText().getBytes());
+                out.write("\n".getBytes());
+            }
+
+            return fileName;
+        } catch (Exception e) {
+             fileName=null;
+        }finally{
+            if(out!=null){
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return fileName;
     }
 }

@@ -21,6 +21,14 @@ public class VectorSearchController {
         return ResponseEntity.ok(searchService.search(request));
     }
 
+    //查询结果存入文件
+    @PostMapping("/search2file")
+    public ResponseEntity<String> seach2file(
+            @RequestBody @Valid VectorSearchRequest request) {
+        return ResponseEntity.ok(searchService.search2file(request));
+    }
+
+
     @GetMapping("/collections")
     public ResponseEntity<List<String>> listCollections() {
         // 实现获取所有集合名称的逻辑

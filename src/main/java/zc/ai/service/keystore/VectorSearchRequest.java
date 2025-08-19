@@ -16,6 +16,16 @@ public class VectorSearchRequest {
     @Min(1)
     @Max(100)
     private int topN = 10;
+    private String resultFileName="";
+
+    public String getResultFileName() {
+        return resultFileName;
+    }
+
+    public void setResultFileName(String resultFileName) {
+        this.resultFileName = resultFileName;
+    }
+
 
     // 可添加其他过滤条件
     private Map<String, String> filters;

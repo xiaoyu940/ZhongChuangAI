@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>组织结构图</title>
+    <style>
+        #chart-container {
+            width: 800px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div id="chart-container">
+    <img src="/api/chart/org" alt="组织结构图">
+</div>
+<button onclick="refresh()">刷新图表</button>
+
+<script>
+    function refresh() {
+        const img = document.querySelector("#chart-container img");
+        img.src = "/org/chart?t=" + new Date().getTime(); // 避免缓存
+    }
+</script>
+</body>
+</html>
