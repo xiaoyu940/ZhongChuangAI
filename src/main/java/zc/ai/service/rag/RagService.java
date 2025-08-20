@@ -47,19 +47,21 @@ public class RagService {
         filePath=this.documentsPath+filePath;
         // First, let's load documents that we want to use for RAG
         Document document = loadDocument(filePath);
+        if("miles-of-smiles-terms-of-use.doc".equals(filePath)){
+            System.out.println("get the doc");
+        }
 
         MessageWindowChatMemory mem=null;
         if(filePath!=null){
-            mem = MessageWindowChatMemory.withMaxMessages(20);
+            mem = MessageWindowChatMemory.withMaxMessages(1);
             String txtMsg = getTxt2String(filePath);
             mem.add(AiMessage.from(txtMsg));
         }
 
-        // Second, let's create an assistant that will have access to our documents
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel) // it should use OpenAI LLM
-                .chatMemory(mem) // it should remember 10 latest messages
-               // .contentRetriever(createContentRetriever(documents)) // it should have access to our documents
+                 //.chatMemory(mem) // it should remember 10 latest messages
+                // .contentRetriever(createContentRetriever(documents)) // it should have access to our documents
                 .build();
 
         return assistant;
@@ -70,8 +72,10 @@ public class RagService {
 
         String txt =null;
         try{
+            System.out.println("创建聊天上下文");
             txt = Files.readString(Path.of(fileName));
         } catch (IOException e) {
+            System.out.println("出错了");
             txt="";
         }
         return txt;

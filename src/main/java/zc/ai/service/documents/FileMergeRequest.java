@@ -1,16 +1,18 @@
 package zc.ai.service.documents;
 
+import java.util.List;
+
 // FileMergeRequest.java
 public class FileMergeRequest {
-    private String sourceFileName;    // 被附加文件
+    private List<String> sourceFileName;    // 被附加文件
     private String appendFileName;   // 附加文件
 
     // getters and setters
-    public String getSourceFileName() {
+    public List<String> getSourceFileName() {
         return sourceFileName;
     }
 
-    public void setSourceFileName(String sourceFileName) {
+    public void setSourceFileName(List<String> sourceFileName) {
         this.sourceFileName = sourceFileName;
     }
 
