@@ -1,57 +1,202 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style>
-        body {
-            font-family: - font-family: "Microsoft YaHei", "SimSun", sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        /* 全局字体设置 */
+        body, div, p, span, td, th {
+            font-family: 'SimSun', 'Microsoft YaHei', sans-serif;
+            -fs-pdf-font-embed: embed;
+            -fs-pdf-font-encoding: Identity-H;
         }
-        h1, h2, h3, h4 {
-            color: #2c3e50;
-            margin-top: 24px;
-            margin-bottom: 16px;
-            font-weight: 600;
-        }
-        h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-        h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-        code {
-            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-            background-color: rgba(27, 31, 35, 0.05);
-            border-radius: 3px;
-            padding: 0.2em 0.4em;
-            font-size: 85%;
-        }
-        pre {
-            background-color: #f6f8fa;
-            border-radius: 3px;
-            padding: 16px;
-            overflow: auto;
-            line-height: 1.45;
-        }
-        blockquote {
-            border-left: 4px solid #dfe2e5;
-            color: #6a737d;
-            padding: 0 1em;
-            margin: 0 0 16px 0;
-        }
+
+        /* 强烈表格样式 - 增强版 */
         table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 16px;
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            table-layout: fixed !important;
+            page-break-inside: avoid !important;
+            -fs-table-paginate: paginate;
+            margin: 15px 0 !important;
+            border: 2px solid #000000 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
         }
+
+        /* 强烈单元格边框 */
         th, td {
-            border: 1px solid #dfe2e5;
-            padding: 6px 13px;
+            border: 2px solid #000000 !important;
+            padding: 8px 10px !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            vertical-align: middle !important;
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+            background-color: #ffffff !important;
         }
+
+        /* 强烈表头样式 */
         th {
-            background-color: #f6f8fa;
-            font-weight: 600;
+            background-color: #e8e8e8 !important;
+            background-image: linear-gradient(to bottom, #f0f0f0, #d8d8d8) !important;
+            font-weight: bold !important;
+            text-align: center !important;
+            border-bottom: 2px solid #000000 !important;
+            border-right: 2px solid #000000 !important;
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        /* 最后一个表头单元格去掉右边框 */
+        th:last-child {
+            border-right: 2px solid #000000 !important;
+        }
+
+        /* 单元格边框增强 */
+        td {
+            border-right: 2px solid #000000 !important;
+            border-bottom: 2px solid #000000 !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+
+        /* 最后一个单元格去掉右边框 */
+        td:last-child {
+            border-right: 2px solid #000000 !important;
+        }
+
+        /* 最后一行单元格底部边框加粗 */
+        tr:last-child td {
+            border-bottom: 2px solid #000000 !important;
+        }
+
+        /* 表格行交替颜色 - 增强对比 */
+        tr:nth-child(even) {
+            background-color: #f8f9fa !important;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #ffffff !important;
+        }
+
+        /* 行悬停效果 */
+        tr:hover {
+            background-color: #e3f2fd !important;
+        }
+
+        /* 单元格悬停效果 */
+        td:hover, th:hover {
+            background-color: #ffeb3b !important;
+            transition: background-color 0.2s ease !important;
+        }
+
+        /* 确保边框在PDF中绝对可见 */
+        *[border], table, th, td {
+            border-style: solid !important;
+            border-color: #000000 !important;
+            border-width: 2px !important;
+        }
+
+        /* 针对openhtmltopdf的强烈优化 */
+        .pdf-table {
+            -fs-keep-with-inline: always;
+            border-rendering: geometricPrecision;
+            -fs-border-precision: 2;
+        }
+
+        /* 表格容器增强 */
+        .table-container {
+            border: 2px solid #2c3e50 !important;
+            padding: 2px !important;
+            margin: 20px 0 !important;
+            background-color: #ecf0f1 !important;
+            border-radius: 4px !important;
+        }
+
+        /* 页面设置 */
+        @page {
+            size: A4;
+            margin: 15mm;
+            @top-center {
+                content: element(header);
+            }
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        /* 主体样式 */
+        .body {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* 强烈避免表格跨页断开 */
+        .avoid-break {
+            page-break-inside: avoid !important;
+            -fs-page-break-min-height: 100mm;
+        }
+
+        /* 表格标题增强 */
+        .table-caption {
+            font-weight: bold !important;
+            font-size: 14px !important;
+            text-align: center !important;
+            margin-bottom: 8px !important;
+            color: #2c3e50 !important;
+            border-bottom: 2px solid #3498db !important;
+            padding-bottom: 5px !important;
+        }
+
+        /* 单元格内容对齐辅助 */
+        .text-center {
+            text-align: center !important;
+        }
+
+        .text-left {
+            text-align: left !important;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        /* 数字单元格样式 */
+        .number-cell {
+            text-align: right !important;
+            font-family: 'Courier New', monospace !important;
+            background-color: #f8f9fa !important;
+        }
+
+        /* 重要数据单元格 */
+        .important-cell {
+            background-color: #fff3cd !important;
+            border: 3px solid #ffc107 !important;
+            font-weight: bold !important;
+        }
+
+        /* 错误状态单元格 */
+        .error-cell {
+            background-color: #f8d7da !important;
+            border: 2px solid #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        /* 成功状态单元格 */
+        .success-cell {
+            background-color: #d4edda !important;
+            border: 2px solid #28a745 !important;
+            color: #155724 !important;
+        }
+
+        /* 确保所有边框都渲染 */
+        .force-border {
+            border: 2px solid #000000 !important;
+            box-shadow: inset 0 0 0 1px #000000 !important;
         }
     </style>
 </head>

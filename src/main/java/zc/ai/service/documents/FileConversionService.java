@@ -1,7 +1,9 @@
 package zc.ai.service.documents;
 
 // FileConversionService.java
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -17,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Service
 public class FileConversionService {
@@ -52,6 +55,12 @@ public class FileConversionService {
 
             // 2. 将Markdown转换为HTML
             MutableDataSet options = new MutableDataSet();
+            options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create()));
+
+            // 设置表格渲染选项
+            options.set(TablesExtension.CLASS_NAME, "markdown-table");
+            options.set(TablesExtension.WITH_CAPTION, false);
+
             Parser parser = Parser.builder(options).build();
             HtmlRenderer renderer = HtmlRenderer.builder(options).build();
 
@@ -73,11 +82,18 @@ public class FileConversionService {
             //TODO bug here 字体无法正常设置
             try (OutputStream os = new FileOutputStream(outputFileName)) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
-                builder.useFont(simsun,"SimSun");
-                builder.useFont(msyh,"Microsoft YaHei");
+                builder.useFont(simsun, "SimSun");
+                builder.useFont(msyh, "Microsoft YaHei");
+
+                // 添加字体别名
+                builder.useFont(simsun, "宋体");
+                builder.useFont(msyh, "微软雅黑");
+
+
                 builder.withHtmlContent(fullHtml, null);
                 builder.toStream(os);
                 builder.run();
+                System.out.println("content is :"+builder.toString());
             }
             //TODO 先写一个html格式的
             Files.writeString(Path.of(request.getOutputFileName().replace("pdf","htm")),fullHtml);
