@@ -21,7 +21,7 @@ public class VectorStoreConfig {
     @Value("${spring.datasource.password}")
     private String password;
 
-    @Value("${vectorstore.dimension:384}")
+    @Value("${vectorstore.dimension:1024}")
     private int dimension;
 
     @Bean

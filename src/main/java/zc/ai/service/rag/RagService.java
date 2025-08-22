@@ -11,6 +11,8 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.List;
 import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 @Service
 public class RagService {
+    private static final Logger logger =  LoggerFactory.getLogger(RagService.class);
 
     @Autowired
     private  OpenAiChatModel chatModel;
@@ -35,14 +38,14 @@ public class RagService {
     public RagResponse processQuestion(RagRequest request) throws IOException {
 
         String question = request.getQuestion();
-        Assistant assistant = this.createAssistant(request.getDocName());
+        Assistant assistant = this.createAssistantWithFileContent(request.getDocName());
 
         String answer = assistant.chat(request.getQuestion());
         // 5. 返回响应
         return new RagResponse(answer);
     }
 
-    public  Assistant createAssistant(String filePath) {
+    public  Assistant createAssistantWithFileContent(String filePath) {
 
         filePath=this.documentsPath+filePath;
         // First, let's load documents that we want to use for RAG
@@ -60,8 +63,20 @@ public class RagService {
 
         Assistant assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel) // it should use OpenAI LLM
-                 //.chatMemory(mem) // it should remember 10 latest messages
-                // .contentRetriever(createContentRetriever(documents)) // it should have access to our documents
+                .chatMemory(mem) // it should remember 10 latest messages
+                //.contentRetriever(createContentRetriever(documents)) // it should have access to our documents
+                .build();
+
+        return assistant;
+    }
+    public  Assistant createAssistant() {
+
+        MessageWindowChatMemory mem=null;
+            mem = MessageWindowChatMemory.withMaxMessages(20);
+
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .chatModel(chatModel) // it should use OpenAI LLM
+                .chatMemory(mem) // it should remember 10 latest messages
                 .build();
 
         return assistant;
@@ -72,10 +87,10 @@ public class RagService {
 
         String txt =null;
         try{
-            System.out.println("创建聊天上下文");
+            logger.info("创建聊天上下文");
             txt = Files.readString(Path.of(fileName));
         } catch (IOException e) {
-            System.out.println("出错了");
+            logger.error("出错了");
             txt="";
         }
         return txt;

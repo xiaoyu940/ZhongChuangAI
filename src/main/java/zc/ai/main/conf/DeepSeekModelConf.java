@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import zc.ai.service.example.Assistant;
+import zc.ai.service.example.DeepSeekClientExample;
 
 import java.time.Duration;
 
@@ -34,8 +35,11 @@ public class DeepSeekModelConf {
     }
 
     @Bean
-    public Assistant deepSeekAssitant() {
+    public DeepSeekClientExample deepSeekAssitant() {
 
-        return null;
+        DeepSeekClientExample example = new DeepSeekClientExample();
+        return example;
     }
+
+
 }
