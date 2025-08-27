@@ -3,6 +3,8 @@ package zc.ai.service.example;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +17,7 @@ import java.util.regex.Pattern;
  * 基于固定目录结构为PDF页码打标签的工具
  */
 public class PdfTaggerByFixedToc {
-
+static Logger logger = LoggerFactory.getLogger(PdfTaggerByFixedToc.class);
     /**
      * 目录项类，包含章节名称和起始页码
      */
@@ -236,7 +238,7 @@ public class PdfTaggerByFixedToc {
         int totalPages = 0;
         try (PDDocument document = PDDocument.load(new File(pdfFilePath))) {
             totalPages = document.getNumberOfPages();
-            System.out.println("PDF总页数: " + totalPages);
+            logger.info("PDF总页数: " + totalPages);
         }
 
         // 为每一页生成标签
@@ -245,7 +247,7 @@ public class PdfTaggerByFixedToc {
             pageTags.add(new PageTag(pageNum, tag));
 
             if (pageNum <= 10 || pageNum % 50 == 0 || pageNum == totalPages) {
-                System.out.println("第" + pageNum + "页: " + tag);
+                logger.info("第" + pageNum + "页: " + tag);
             }
         }
 
@@ -254,7 +256,7 @@ public class PdfTaggerByFixedToc {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.writeValue(new File(outputJsonPath), pageTags);
-            System.out.println("标签已导出至: " + outputJsonPath);
+            logger.info("标签已导出至: " + outputJsonPath);
         }
     }
 
@@ -265,10 +267,10 @@ public class PdfTaggerByFixedToc {
 
             generatePageTags(pdfPath, outputPath);
 
-            System.out.println("\n标签生成完成！");
+            logger.info("\n标签生成完成！");
 
         } catch (IOException e) {
-            System.err.println("处理失败: " + e.getMessage());
+            logger.info("处理失败: " + e.getMessage());
             e.printStackTrace();
         }
     }

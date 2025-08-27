@@ -9,6 +9,10 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +27,7 @@ import java.util.Arrays;
 
 @Service
 public class FileConversionService {
-
+static Logger logger = LoggerFactory.getLogger(FileConversionService.class);
     @Value("${zc.ai.service.project-dir}")
  private String project_dir=null;
     public FileConversionResponse convertMarkdownToPdf(FileConversionRequest request) {
@@ -66,7 +70,7 @@ public class FileConversionService {
 
             Node document = parser.parse(markdownContent);
             String htmlContent = renderer.render(document);
-
+           // htmlContent = cleanHtmlTags(htmlContent);
             // 添加基本HTML结构
 // 修改后的Markdown转HTML部分
             String fullHtml = Files.readString(
@@ -78,7 +82,9 @@ public class FileConversionService {
             File simsun = Paths.get(getClass().getResource("/fonts/simsun.ttc").toURI()).toFile();
 
             fullHtml=fullHtml.replace("<!-- CONTENT_PLACEHOLDER -->", htmlContent);
-            // 3. 将HTML转换为PDF
+            // 3.
+
+
             //TODO bug here 字体无法正常设置
             try (OutputStream os = new FileOutputStream(outputFileName)) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -93,7 +99,8 @@ public class FileConversionService {
                 builder.withHtmlContent(fullHtml, null);
                 builder.toStream(os);
                 builder.run();
-                System.out.println("content is :"+builder.toString());
+
+                logger.info("content is :"+builder.toString());
             }
             //TODO 先写一个html格式的
             Files.writeString(Path.of(request.getOutputFileName().replace("pdf","htm")),fullHtml);
@@ -113,5 +120,20 @@ public class FileConversionService {
         }
 
         return response;
+    }
+
+    private String cleanHtmlTags(String content) {
+        // 使用 JSoup 清理 HTML，确保标签格式正确
+        Safelist safelist = Safelist.relaxed()
+                .addAttributes(":all", "style", "class", "id"); // 允许的属性
+
+        // 清理并规范化 HTML
+        String cleaned = Jsoup.clean(content, safelist);
+
+        // 确保 br 标签正确闭合
+        cleaned = cleaned.replaceAll("<br>", "<br/>")
+                .replaceAll("<br\\s+/>", "<br/>");
+
+        return cleaned;
     }
 }

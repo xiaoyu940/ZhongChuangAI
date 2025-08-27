@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public class VectorSearchService {
         EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
                 .maxResults(request.getTopN())
-                .minScore(0.5) // 可配置的相似度阈值
+                .minScore(0.3) // 可配置的相似度阈值
                 .build();
 
         // 3. 执行搜索
@@ -81,7 +82,9 @@ public class VectorSearchService {
         return embeddingId;
     }
 
+
     public int batchAddEmbeddings(String collectionName, List<EmbeddingItem> items) {
+
         // 1. 批量生成向量
         List<Embedding> embeddings = items.stream()
                 .map(item -> embeddingModel.embed(item.getText()).content())
@@ -97,6 +100,19 @@ public class VectorSearchService {
 
         return ids.size();
     }
+
+    public List<Map<String, Object>> metasSearch(VectorSearchRequest request){
+
+        VectorSearchResponse response = this.search(request);
+        List<EmbeddingResult> results = response.getResults();
+        List<Map<String,Object>> metas = new ArrayList<>();
+
+        for(EmbeddingResult res:results){
+            Map<String, Object> meta = res.getMetadata();
+            metas.add(meta);
+        }
+        return  metas;
+      }
 
     public String search2file(@Valid VectorSearchRequest request) {
         String fileName =request.getResultFileName();

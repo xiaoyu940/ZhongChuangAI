@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PDFVectorProcessor {
 
+    //按页逐页生成摘要
     public static void main(String[] args) {
         try {
             // 配置参数

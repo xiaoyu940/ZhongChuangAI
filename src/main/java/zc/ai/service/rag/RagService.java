@@ -51,7 +51,7 @@ public class RagService {
         // First, let's load documents that we want to use for RAG
         Document document = loadDocument(filePath);
         if("miles-of-smiles-terms-of-use.doc".equals(filePath)){
-            System.out.println("get the doc");
+            logger.info("get the doc");
         }
 
         MessageWindowChatMemory mem=null;

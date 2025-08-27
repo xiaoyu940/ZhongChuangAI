@@ -107,10 +107,10 @@ public class DeepSeekClientExample {
         String response = callDeepSeek(prompt);
 
         if (response != null) {
-            System.out.println("DeepSeek 响应:");
-            System.out.println(response);
+            logger.info("DeepSeek 响应:");
+            logger.info(response);
         } else {
-            System.out.println("调用失败");
+            logger.info("调用失败");
         }
         return response;
     }
@@ -131,10 +131,10 @@ public class DeepSeekClientExample {
         String response = callDeepSeek(buf.toString());
 
         if (response != null) {
-            System.out.println("DeepSeek 响应:");
-            System.out.println(response);
+            logger.info("DeepSeek 响应:");
+            logger.info(response);
         } else {
-            System.out.println("调用失败");
+            logger.info("调用失败");
         }
         return response;
     }

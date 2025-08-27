@@ -21,7 +21,7 @@ public class VectorStoreConfig {
     @Value("${spring.datasource.password}")
     private String password;
 
-    @Value("${vectorstore.dimension:1024}")
+    @Value("${vectorstore.dimension:384}")
     private int dimension;
 
     @Bean
@@ -33,7 +33,7 @@ public class VectorStoreConfig {
                 .user(username)
                 .password(password)
                 .database(extractDatabase(dbUrl))
-                .table("zhongchuang_vector") // 基础表名，实际查询时会动态替换
+                .table("pdf_vector") // 基础表名，实际查询时会动态替换
                 .dimension(dimension)
                 .createTable(true)
                 .build();

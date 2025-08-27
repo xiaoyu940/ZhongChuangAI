@@ -12,16 +12,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zc.ai.service.example.Assistant;
 import zc.ai.service.example.DeepSeekClientExample;
+import zc.ai.service.keystore.VectorSearchRequest;
+import zc.ai.service.keystore.VectorSearchService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/doc/pdf")
 public class PdfSelectionController {
 
+    private static final String PAGE_NUM = "page_num";
     @Value("${zc.ai.service.project-dir}")
     private String projectDir;
     @Autowired
@@ -33,6 +39,45 @@ public class PdfSelectionController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    VectorSearchService vectorSearchService;
+
+    @PostMapping("/select-kb")
+    public ResponseEntity<SelectionResponse> selectByTopic2File(@RequestBody SelectionRequest request) throws IOException {
+
+        request.setPdfName(this.projectDir+request.getPdfName());
+        request.setOutputFileName(this.projectDir+request.getOutputFileName());
+        VectorSearchRequest vRequest = new VectorSearchRequest();
+
+        vRequest.setKeywords(List.of(request.getTopic()));
+        //TODO imhencement here
+//        vRequest.setFilters(request.get);
+        vRequest.setResultFileName(request.getOutputFileName());
+        //vRequest.setTopN(request.get);
+        List<Map<String, Object>> metas = vectorSearchService.metasSearch(vRequest);
+        List<Integer> pages = new ArrayList<>();
+        for(Map<String, Object> metaMap:metas){
+            String pageString = (String)metaMap.get(PAGE_NUM);
+            if(pageString==null){
+                continue;
+            }
+            pages.add(Integer.valueOf(pageString));
+        }
+        String pdfName = request.getPdfName();
+        Collections.sort(pages);
+        String outputFilePath = pdfProcessingService.extractAndSavePages(
+                pages,1,pdfName, request.getOutputFileName());
+
+        SelectionResponse response = new SelectionResponse(
+                pages,
+                request.getOutputFileName(),
+                "success",
+                "页面选择完成，结果已保存到: " + outputFilePath
+        );
+
+        return ResponseEntity.ok(response);
+    }
+        //用大模型选择用户想要的页面
     @PostMapping("/select-pages")
     public ResponseEntity<SelectionResponse> selectPages(@RequestBody SelectionRequest request) {
         try {
@@ -75,6 +120,7 @@ public class PdfSelectionController {
                     "error",
                     "处理失败: " + e.getMessage()
             );
+            System.out.println("处理失败:"+response.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

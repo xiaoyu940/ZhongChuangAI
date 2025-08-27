@@ -61,10 +61,11 @@ public class RenderController {
         Template template = new Template("report",fileTmpStr,freemarkerConfiguration);
 
         String ragFile = request.getRagFileName();
-       // Assistant assistant = ragService.createAssistantWithFileContent(ragFile);
-        Assistant assistant = ragService.createAssistant();
+        Assistant assistant = ragService.createAssistantWithFileContent(ragFile);
+       // Assistant assistant = ragService.createAssistant();
         // 3. 渲染模板
         Map<String, Object> modelData = new HashMap<>();
+        //TODO bug here 使用了deepseek的实例，没有使用创建的
         //modelData.put("AI",assistant);
         modelData.put("AI",dpAssistant);
         modelData.put("CHART",chart);

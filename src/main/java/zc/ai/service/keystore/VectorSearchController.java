@@ -29,11 +29,6 @@ public class VectorSearchController {
     }
 
 
-    @GetMapping("/collections")
-    public ResponseEntity<List<String>> listCollections() {
-        // 实现获取所有集合名称的逻辑
-        return ResponseEntity.ok(List.of("default"));
-    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addEmbedding(@Valid @RequestBody AddEmbeddingRequest request) {

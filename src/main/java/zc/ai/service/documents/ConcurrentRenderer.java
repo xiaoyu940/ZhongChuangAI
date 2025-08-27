@@ -1,6 +1,8 @@
 package zc.ai.service.documents;
 
 import freemarker.template.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +13,7 @@ import java.util.regex.*;
 
 @Service
 public class ConcurrentRenderer {
-
+Logger logger = LoggerFactory.getLogger(ConcurrentRenderer.class);
     @Autowired
     private Configuration freeMarkerConfig;
 
@@ -27,7 +29,7 @@ public class ConcurrentRenderer {
 
         // 解析分段
         List<String> segments = parseSegments(templateContent);
-        System.out.println("发现 " + segments.size() + " 个分段");
+        logger.info("发现 " + segments.size() + " 个分段");
 
         // 为每个分段创建独立线程
         List<Future<String>> futures = new ArrayList<>();
@@ -38,16 +40,16 @@ public class ConcurrentRenderer {
             final int segmentIndex = i;
 
             Callable<String> task = () -> {
-                System.out.println("开始渲染分段 " + segmentIndex);
+                logger.info("开始渲染分段 " + segmentIndex);
                 long startTime = System.currentTimeMillis();
 
                 try {
                     String result = renderSegment(segmentContent, dataModel, "segment_" + segmentIndex);
                     long duration = System.currentTimeMillis() - startTime;
-                    System.out.println("分段 " + segmentIndex + " 渲染完成, 耗时: " + duration + "ms");
+                    logger.info("分段 " + segmentIndex + " 渲染完成, 耗时: " + duration + "ms");
                     return result;
                 } catch (Exception e) {
-                    System.err.println("分段 " + segmentIndex + " 渲染失败: " + e.getMessage());
+                    logger.error("分段 " + segmentIndex + " 渲染失败: " + e.getMessage());
                     throw e;
                 }
             };

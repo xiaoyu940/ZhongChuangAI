@@ -1,6 +1,8 @@
 package zc.ai.service.documents;
 
 // FileMergeService.java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.*;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @Service
 public class FileMergeService {
-
+static Logger logger = LoggerFactory.getLogger(FileMergeService.class);
     @Value("${zc.ai.service.project-dir}")
     private   String project_dir=null;
 
@@ -40,10 +42,10 @@ public class FileMergeService {
                 while ((bytesRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
-                System.out.println("文件追加完成！");
+                logger.info("文件追加完成！");
 
             } catch (IOException e) {
-                System.err.println("发生错误: " + e.getMessage());
+                logger.info("发生错误: " + e.getMessage());
             }
 
         }
