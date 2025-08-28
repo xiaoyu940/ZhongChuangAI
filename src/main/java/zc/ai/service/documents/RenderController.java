@@ -3,6 +3,8 @@ package zc.ai.service.documents;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/api/docs")
 public class RenderController {
+    static Logger logger = LoggerFactory.getLogger(RenderController.class);
 
     @Value("${zc.ai.service.project-dir}")
     private String projectDir;
@@ -57,6 +60,7 @@ public class RenderController {
         }
 
         String fileTmpStr = Files.readString(tmpFile);
+        logger.info("模板内容:"+fileTmpStr);
          // 2. 动态加载模板
         Template template = new Template("report",fileTmpStr,freemarkerConfiguration);
 
@@ -72,6 +76,7 @@ public class RenderController {
 
 //        String docTxt = FreeMarkerTemplateUtils.processTemplateIntoString(template, modelData);
         String docTxt = currRender.renderConcurrently(fileTmpStr,modelData);
+        docTxt = docTxt.replace("<!--AI-SEGMENT-->","");
         Files.writeString(Path.of(targetFileName),docTxt);
 
         return ResponseEntity.ok(targetFileName);
